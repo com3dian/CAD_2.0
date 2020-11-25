@@ -147,8 +147,23 @@ self.leftFactsGroup.update(currSensFacts, currNeurFacts)
 ```python
 # init potNewZeroLevelContext
 potNewZeroLevelContext = tuple([self.leftFactsGroup, currSensFacts])
-# potNewZeroLevelContext is like ({1, 2, 4, 2147483659, ..., 2147483675}, (1, 2, 4))
+# potNewZeroLevelContext is like ((1, 2, 4, 2147483659, ..., 2147483675), (1, 2, 4))
 ```
+
+```python
+self.maxLeftSemiContextsLenght = maxLeftSemiContextsLenght # 7
+
+self.factsDics = [{},{}] # 保存{semifact: [semiContextValue, ]}，
+					   # 即每⼀个semifact键对应所有semiContext中含有该semifact的semiContextValue
+self.semiContextDics = [{},{}] # 保存{semiContext: semiContextID}
+self.semiContextValuesLists = [[],[]] #
+self.crossedSemiContextsLists = [[],[]] #
+self.contextsValuesList = [] # 
+
+self.newContextID = False
+```
+
+
 
 ### contextOperator.getContextByFacts
 
@@ -178,10 +193,53 @@ newContextFlag = self.contextOperator.getContextByFacts([potNewZeroLevelContext]
                     b) number of the really new contexts that have been saved to the
                     context memory.
 """
-# newContextsList is like [({1, 2, 4, 2147483659, ..., 2147483675}, (1, 2, 4))]
+# newContextsList is like [((0, 3, 4), (0, 3, 4)), ((0, 3, 4), (0, 3, 4))]
 ```
 
 `context (zerolevel=1)`
+
+Then we hash the left part and right part of `newContextsList`.
+
+```python
+leftHash = leftFacts.__hash__()# leftFacts is like (4, )
+rightHash = rightFacts.__hash__()# rightFacts is like (3, 4)
+                
+nextLeftSemiContextNumber = len(self.semiContextDics[0]) 
+leftSemiContextID = self.semiContextDics[0].setdefault(leftHash, nextLeftSemiContextNumber)
+```
+
+### `semiContextDics`
+
+`semiContextDics` is like `[{},{}]`.
+
+```python
+semiContextDics = [{},{}] # init
+# hash Dict
+nextLeftSemiContextNumber = len(self.semiContextDics[0]) # the length of left semiContextDics
+# ...
+leftSemiContextID = self.semiContextDics[0].setdefault(leftHash, nextLeftSemiContextNumber)
+# if leftHash in keys return semiContextDics[0].leftHash
+# else return nextLeftSemiContextNumber which is len(self.semiContextDics[0])
+# ...
+if leftSemiContextID == nextLeftSemiContextNumber :
+    # which means leftHash
+    leftSemiContextValues = [[] , len(leftFacts), 0, {}] # ???
+    self.semiContextValuesLists[0].append(leftSemiContextValues) 
+    # self.semiContextValuesLists = [[],[]]
+    
+    for fact in leftFacts :
+        # leftFacts is tuple
+        # (1, 2, 4, ...)
+        semiContextList = self.factsDics[0].setdefault(fact, []) # self.factsDics = [{},{}]
+        # ???
+        # ???
+        
+        semiContextList.append(leftSemiContextValues)
+```
+
+### `factsDics`
+
+
 
 
 
