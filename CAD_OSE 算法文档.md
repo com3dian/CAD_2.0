@@ -155,8 +155,11 @@ self.maxLeftSemiContextsLenght = maxLeftSemiContextsLenght # 7
 
 self.factsDics = [{},{}] # 保存{semifact: [semiContextValue, ]}，
 					   # 即每⼀个semifact键对应所有semiContext中含有该semifact的semiContextValue
-self.semiContextDics = [{},{}] # 保存{semiContext: semiContextID}
-self.semiContextValuesLists = [[],[]] #
+self.semiContextDics = [{},{}]  # 保存{semiContext: semiContextID}
+                                # [{}, {}]
+                                # 每一个哈希值作为键值对应他的位数
+                                # 
+self.semiContextValuesLists = [[],[]] # 
 self.crossedSemiContextsLists = [[],[]] #
 self.contextsValuesList = [] # 
 
@@ -208,7 +211,7 @@ nextLeftSemiContextNumber = len(self.semiContextDics[0])
 leftSemiContextID = self.semiContextDics[0].setdefault(leftHash, nextLeftSemiContextNumber)
 ```
 
-### `semiContextDics`
+### `self.semiContextDics`
 
 `semiContextDics` is like `[{},{}]`.
 
@@ -224,6 +227,8 @@ leftSemiContextID = self.semiContextDics[0].setdefault(leftHash, nextLeftSemiCon
 if leftSemiContextID == nextLeftSemiContextNumber :
     # which means leftHash
     leftSemiContextValues = [[] , len(leftFacts), 0, {}] # ???
+    # Value is like that
+    # 
     self.semiContextValuesLists[0].append(leftSemiContextValues) 
     # self.semiContextValuesLists = [[],[]]
     
@@ -231,13 +236,48 @@ if leftSemiContextID == nextLeftSemiContextNumber :
         # leftFacts is tuple
         # (1, 2, 4, ...)
         semiContextList = self.factsDics[0].setdefault(fact, []) # self.factsDics = [{},{}]
-        # ???
-        # ???
-        
+        # so factsDics is used to save the facts
+        # 浅引用
+        # self.factsDics[0].append(leftSemiContextValues)
         semiContextList.append(leftSemiContextValues)
+        # leftSemiContextValues = [[] , len(leftFacts), 0, {}]
 ```
 
-### `factsDics`
+### `self.factsDics & self.contextValueList`
+
+  ```python
+# self.contextValueList = []
+# self.semiContextValuesLists = [[],[]]
+# 
+# self.factsDics is a list with length 2
+# [{}, {}]
+# 
+  ```
+
+### Value, Context, Crosscontext 
+
+```python
+# Value is like.
+# [[] , len(leftFacts), 0, {}]
+nextRightSemiContextNumber = len(self.semiContextDics[1]) # [{}, {}]
+
+rightSemiContextID = self.semiContextDics[1].setdefault(rightHash, nextRightSemiContextNumber)
+# 
+# 
+if rightSemiContextID == nextRightSemiContextNumber :
+     rightSemiContextValues = [[] , len(rightFacts), 0] # 
+     self.semiContextValuesLists[1].append(rightSemiContextValues)
+     for fact in rightFacts :
+         # rightFacts is (1, 2, 5)
+         semiContextList = self.factsDics[1].setdefault(fact, []) # setdefault
+         semiContextList.append(rightSemiContextValues) # 
+            
+nextFreeContextIDNumber = len(self.contextsValuesList) 
+contextID = self.semiContextValuesLists[0][leftSemiContextID][3].setdefault(
+    rightSemiContextID, 
+    nextFreeContextIDNumber
+	)
+```
 
 
 
